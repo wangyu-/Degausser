@@ -1,11 +1,11 @@
 #include <string.h>
 #include <3ds.h>
 
-u32 glyphs[6756][6];
-void print8(char* str);
-void print16(u16* str);
+extern u32 glyphs[6756][6];
+void print(char* str);
+void print(u16* str);
 void printRight(char* str);
-#define print(STR) _Generic((STR), char*: print8, u16*: print16)(STR)
+//#define print(STR) _Generic((STR), char*: print8, u16*: print16)(STR)
 void glyphInit();
 void glyphWait();
 void glyphExit();
@@ -88,8 +88,8 @@ void printChar(u16 c)
 	}
 }
 
-void print8(char* str) { while (*str) printChar(*str++); glyphWait(); }
-void print16(u16* str) { while (*str) printChar(*str++); glyphWait(); }
+void print(char* str) { while (*str) printChar(*str++); glyphWait(); }
+void print(u16* str) { while (*str) printChar(*str++); glyphWait(); }
 
 void printRight(char* str)
 {

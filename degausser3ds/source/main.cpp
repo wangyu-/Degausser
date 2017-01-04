@@ -7,7 +7,7 @@
 #define MINIZ_HEADER_FILE_ONLY
 #include "miniz.c"
 #define GLYPH_HEADER_FILE_ONLY
-#include "glyph.c"
+#include "glyph.cpp"
 
 #define TRY(item, str) if (item) { myprintf(str "\n"); return -1; }
 #define TRYCONT(item, str) if (item) { myprintf(str "\n"); continue; }
@@ -86,7 +86,7 @@ Result gz_compress(void* dst, u32* dstLen, const void* src, u32 srcLen)
 	memcpy(dst, gzip_header, 10);
 	if (!(*dstLen = tdefl_compress_mem_to_mem(dst + 10, *dstLen - 18, src, srcLen, 0x300))) return -1; // ERROR COMPRESSING
 	*dstLen += 18;
-	*(u32*)(dst + *dstLen - 8) = mz_crc32(0, src, srcLen);
+	*(u32*)(dst + *dstLen - 8) = mz_crc32(0, (const unsigned char*)src, srcLen);
 	*(u32*)(dst + *dstLen - 4) = srcLen;
 	return 0;
 }
@@ -96,7 +96,7 @@ Result gz_decompress(void* dst, u32 dstLen, const void* src, u32 srcLen)
 	if (memcmp(src, gzip_header, 10)) return -1; // GZIP HEADER ERROR
 	if (dstLen != *(u32*)(src + srcLen - 4)) return -2; // UNEXPECTED LENGTH
 	if (dstLen != tinfl_decompress_mem_to_mem(dst, *(u32*)(src + srcLen - 4), src + 10, srcLen - 18, 4)) return -3; // DECOMPRESS FAILED
-	if (*(u32*)(src + srcLen - 8) != mz_crc32(0, dst, dstLen)) return -4; // WRONG CRC32
+	if (*(u32*)(src + srcLen - 8) != mz_crc32(0, (const unsigned char*) dst, dstLen)) return -4; // WRONG CRC32
 	return 0;
 }
 
@@ -348,7 +348,7 @@ int main()
 	
 	//FSUSER_OpenArchive(&sdmc_archive); ImportPacks(); while(true);
 	
-	myprintf("== degausser3ds v2.2a ==\n");
+	myprintf("== degausser3ds v2.2a new==\n");
 	myprintf("Loading Daigasso! Band Bros P extdata into memory...\n");
 	if (FSUSER_OpenArchive(&extdata_archive)) myprintf("ERROR: Unable to open DBBP extdata.\n");
 	else if (FSUSER_OpenArchive(&sdmc_archive)) myprintf("ERROR: Unable to open SDMC archive.\n");
