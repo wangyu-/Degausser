@@ -12,11 +12,20 @@
 #include "comm.h"
 
 
-u8 buffer[1024*1024];
+u8 buffer[524288];
+
+// SANITY CHECKS
+typedef char test_item[sizeof(_JbMgrItem) == 312 ? 1 : -1];
+typedef char test_jbmgr[sizeof(jbMgr) == 1154408 ? 1 : -1];
+typedef char test_jbmgr[sizeof(PackHeader) == 68 ? 1 : -1];
+
+// archive-related stuff
 
 u32 extdata_archive_lowpathdata[3] = {MEDIATYPE_SD, 0xa0b, 0};
 FS_Archive extdata_archive = {ARCHIVE_EXTDATA, {PATH_BINARY, 0xC, &extdata_archive_lowpathdata}};
 FS_Archive sdmc_archive = {ARCHIVE_SDMC, {PATH_ASCII, 1, ""}};
+
+
 
 Result ReadJbMgr()
 {
