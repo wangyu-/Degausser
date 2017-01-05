@@ -2,13 +2,15 @@
 #include <3ds.h>
 
 extern u32 glyphs[6756][6];
-void print(char* str);
-void print(u16* str);
+
 void printRight(char* str);
 //#define print(STR) _Generic((STR), char*: print8, u16*: print16)(STR)
 void glyphInit();
 void glyphWait();
 void glyphExit();
+
+void print(char* str);
+void print(u16* str);
 
 #ifndef GLYPH_HEADER_FILE_ONLY
 u16 *scrTop, *scrBtm;
@@ -99,6 +101,17 @@ void printRight(char* str)
 	printChar('\n');
 	glyphWait();
 }
+
+void myprintf(char* fmt, ...)
+{
+	char buffer[256];
+	va_list args;
+	va_start(args,fmt);
+	vsprintf(buffer, fmt, args);
+	va_end(args);
+	print(buffer);
+}
+
 
 u32 glyphs[6756][6] = { //taken from typeface misc-fixed-12x13ja
 // CODE, then the remaining 20 bytes are 156 bits of glyph image

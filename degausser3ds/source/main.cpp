@@ -9,96 +9,12 @@
 #define GLYPH_HEADER_FILE_ONLY
 #include "glyph.cpp"
 
-#define TRY(item, str) if (item) { myprintf(str "\n"); return -1; }
-#define TRYCONT(item, str) if (item) { myprintf(str "\n"); continue; }
+#include "comm.h"
 
-typedef struct
-{
-	u32 ID, ID2, Flags;
-	s16 Singer, Icon;
-	u16 Title[51], Title2[51], Author[20];
-	u8  Scores[50];
-} _JbMgrItem;
 
-struct
-{
-	u32 Magic;
-	u16 Version, Count;
-	_JbMgrItem Items[3700];
-} jbMgr;
-
-typedef struct
-{
-	u32 Version;
-	struct
-	{
-		u32 Used, UncompLen, Offset, CompLen;
-	} Parts[4];
-} PackHeader;
-
-static const u8 gzip_header[10] = { 0x1F, 0x8B, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03 };
-u8 buffer[524288];
-
-// SANITY CHECKS
-typedef char test_item[sizeof(_JbMgrItem) == 312 ? 1 : -1];
-typedef char test_jbmgr[sizeof(jbMgr) == 1154408 ? 1 : -1];
-typedef char test_jbmgr[sizeof(PackHeader) == 68 ? 1 : -1];
-
-// archive-related stuff
 u32 extdata_archive_lowpathdata[3] = {MEDIATYPE_SD, 0xa0b, 0};
 FS_Archive extdata_archive = {ARCHIVE_EXTDATA, {PATH_BINARY, 0xC, &extdata_archive_lowpathdata}};
 FS_Archive sdmc_archive = {ARCHIVE_SDMC, {PATH_ASCII, 1, ""}};
-
-// custom version of printf that calls print()
-void myprintf(char* fmt, ...)
-{
-	char buffer[256];
-	va_list args;
-	va_start(args,fmt);
-	vsprintf(buffer, fmt, args);
-	va_end(args);
-	print(buffer);
-}
-
-// concatenate UTF16 strings
-void ConcatUTF16(u16* dst, bool sanitizeFirst, ...)
-{
-	va_list vl;
-	va_start(vl, sanitizeFirst);
-	for (u16* src; (src = va_arg(vl, u16*)); sanitizeFirst = true)
-	{
-		for (u16 c; (c = *src); src++)
-		{
-			if (sanitizeFirst && (c == '\\' || c == '/' || c == '?' || c == '*' ||
-				c == ':' || c == '|' || c == '"' || c == '<' || c == '>'))
-			{
-				c += 0xFEE0;
-			}
-			*dst++ = c;
-		}
-	}
-	va_end(vl);
-	*dst = 0;
-}
-
-Result gz_compress(void* dst, u32* dstLen, const void* src, u32 srcLen)
-{
-	memcpy(dst, gzip_header, 10);
-	if (!(*dstLen = tdefl_compress_mem_to_mem(dst + 10, *dstLen - 18, src, srcLen, 0x300))) return -1; // ERROR COMPRESSING
-	*dstLen += 18;
-	*(u32*)(dst + *dstLen - 8) = mz_crc32(0, (const unsigned char*)src, srcLen);
-	*(u32*)(dst + *dstLen - 4) = srcLen;
-	return 0;
-}
-
-Result gz_decompress(void* dst, u32 dstLen, const void* src, u32 srcLen)
-{
-	if (memcmp(src, gzip_header, 10)) return -1; // GZIP HEADER ERROR
-	if (dstLen != *(u32*)(src + srcLen - 4)) return -2; // UNEXPECTED LENGTH
-	if (dstLen != tinfl_decompress_mem_to_mem(dst, *(u32*)(src + srcLen - 4), src + 10, srcLen - 18, 4)) return -3; // DECOMPRESS FAILED
-	if (*(u32*)(src + srcLen - 8) != mz_crc32(0, (const unsigned char*) dst, dstLen)) return -4; // WRONG CRC32
-	return 0;
-}
 
 Result ReadJbMgr()
 {
