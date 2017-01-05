@@ -238,7 +238,7 @@ Result ImportPacks(int c=0)
 				bbp.bbp_to_raw();
 				memcpy(buffer,bbp.get_raw(),bbp.raw_size());
 				size=bbp.raw_size();
-				_JbMgrItem* item = (_JbMgrItem*)buffer;
+				item = (_JbMgrItem*)buffer;
 			}
 			//int index = FindEmptySlot();
 			int index = FindSongID(-1);
