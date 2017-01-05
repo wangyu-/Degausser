@@ -42,7 +42,7 @@ Result ReadJbMgr()
 	TRY(FSFILE_Read(handle, NULL, 0, &buffer, size2), "Unable to read jbMgr");
 	FSFILE_Close(handle);
 
-	TRY(gz_decompress(&jbMgr, sizeof(jbMgr), buffer, size2), "Unable to decompress jbMgr");
+	TRY(gz_decompress((u8 *)&jbMgr, sizeof(jbMgr), buffer, size2), "Unable to decompress jbMgr");
 	
 	myprintf("Successfully loaded extdata://00000a0b/jb/mgr.bin!\n");
 	return 0;
@@ -51,7 +51,7 @@ Result ReadJbMgr()
 Result WriteJbMgr()
 {
 	u32 compLen = sizeof(buffer);
-	TRY(gz_compress(buffer, &compLen, &jbMgr, sizeof(jbMgr)), "Unable to compress jbMgr");
+	TRY(gz_compress(buffer, &compLen, (u8 *)&jbMgr, sizeof(jbMgr)), "Unable to compress jbMgr");
 	
 	char* paths[2] = {"/jb/mgr.bin", "/jb/mgr_.bin"};
 	for (int i = 0; i < 2; i++)
