@@ -255,6 +255,7 @@ void ShowInstructions()
 	myprintf("Press START to exit.\n\n");
 }
 
+u8 buff[1024*1024];
 int main()
 {
 	// Initialize services

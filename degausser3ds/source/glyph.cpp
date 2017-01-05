@@ -1,5 +1,6 @@
 #include <string.h>
 #include <3ds.h>
+#include <stdarg.h>
 
 extern u32 glyphs[6756][6];
 
@@ -11,6 +12,10 @@ void glyphExit();
 
 void print(char* str);
 void print(u16* str);
+void myprintf(char* fmt, ...);
+
+#define TRY(item, str) if (item) { myprintf(str "\n"); return -1; }
+#define TRYCONT(item, str) if (item) { myprintf(str "\n"); continue; }
 
 #ifndef GLYPH_HEADER_FILE_ONLY
 u16 *scrTop, *scrBtm;
