@@ -13,13 +13,13 @@
 #include "bbp_process.h"
 
 u8 buffer[524288];
-jbMgr jbMgr;
+JbMgr jbMgr;
 Bbp bbp;
 
 // SANITY CHECKS
 typedef char test_item[sizeof(_JbMgrItem) == 312 ? 1 : -1];
 typedef char test_jbmgr[sizeof(jbMgr) == 1154408 ? 1 : -1];
-typedef char test_jbmgr[sizeof(PackHeader) == 68 ? 1 : -1];
+typedef char test_jbmgr2[sizeof(PackHeader) == 68 ? 1 : -1];
 
 // archive-related stuff
 
@@ -157,7 +157,6 @@ Result DumpAllPacks()
 
 Result ImportPacks(int c)
 {
-	print("fuck");
 	Handle dirHandle;
 	if(c==0)
 	{
@@ -396,8 +395,8 @@ void ShowInstructions()
 	{
 		myprintf("Press X to dump all BBP files(to /bbpdump/).\n");
 		myprintf("Press Y to import all BBP files(from /bbpimport/).\n");
-		myprintf("Press A to import all BBP files as custom(from /bbpimportc/).\n");
-		myprintf("Press SELECT to delete BBP files(according to /bbpdelete/).\n");
+		myprintf("Press A to import all BBP files as custom\n(from /bbpimportc/).\n");
+		myprintf("Press SELECT to delete BBP files\n(according to /bbpdelete/).\n");
 	}
 	myprintf("Press START to exit.\n\n");
 }
@@ -412,7 +411,7 @@ int main()
 	
 	//FSUSER_OpenArchive(&sdmc_archive); ImportPacks(); while(true);
 	
-	myprintf("== degausser3ds v2.2a new==\n");
+	myprintf("== degausser3ds v2.2a modified==\n");
 	myprintf("Loading Daigasso! Band Bros P extdata into memory...\n");
 	if (FSUSER_OpenArchive(&extdata_archive)) myprintf("ERROR: Unable to open DBBP extdata.\n");
 	else if (FSUSER_OpenArchive(&sdmc_archive)) myprintf("ERROR: Unable to open SDMC archive.\n");

@@ -64,7 +64,7 @@ typedef struct
 	u8  Scores[50];
 } _JbMgrItem;
 
-struct jbMgr
+struct JbMgr
 {
 	u32 Magic;
 	u16 Version, Count;
