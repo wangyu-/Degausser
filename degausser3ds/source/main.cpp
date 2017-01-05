@@ -136,7 +136,7 @@ Result DumpAllPacks()
 		
 		// dump contents of buffer to "/bbpdump/<title> (<author>).bbp"
 		unsigned char tmp_id[10];
-		sprintf((char*)tmp_id,"%08X-",item->ID);
+		sprintf((char*)tmp_id,"%08lx-",item->ID);
 		u16 tmp_id2[10];
 		for(int j=0;j<10;j++)
 			tmp_id2[j]=tmp_id[j];
