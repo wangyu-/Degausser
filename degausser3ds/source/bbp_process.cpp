@@ -60,21 +60,51 @@ struct Bbp
 		if ((res=gz_decompress2(main,&size_main,raw+sizeof(item)+header.main_start,header.main_size))!=0)
 		{
 			testprintf("decompress main fail,res=%d",res);
-
 			return -1;
 		}
-		if((res=gz_decompress2(vol,&size_vol,raw+sizeof(item)+header.vol_start,header.vol_size))!=0)
+		if(header.has_vol==1)
 		{
-			testprintf("decompress vol fail,res=%d",res);
-			return -1;
+			if((res=gz_decompress2(vol,&size_vol,raw+sizeof(item)+header.vol_start,header.vol_size))!=0)
+			{
+				testprintf("decompress vol fail,res=%d",res);
+				return -1;
+			}
 		}
 		return 0;
 	}
 	int bbp_to_raw()
 	{
+		int res;
+		memcpy(raw,(u8*)&item,sizeof(item));
+
+		if((res=gz_compress(raw+header.main_start+sizeof(item),&header.main_size,main,size_main)!=0))
+		{
+			testprintf("gz_compress main fail,res=%d",res);
+			return -1;
+		}
+		size=raw+header.main_start+sizeof(item)+header.main_size;
+
+		if(header.has_vol==1)
+		{
+			if((res=gz_compress(raw+header.vol_start+sizeof(item),&header.vol_size,vol,size_vol)!=0))
+			{
+				testprintf("gz_compress vol fail,res=%d",res);
+				return -1;
+			}
+			header.vol_start=header.main_start+header.main_size;
+			size=raw+header.vol_start+sizeof(item)+header.vol_size;
+		}
+		memcpy(raw+sizeof(item)/*312*/,(u8*)&header,sizeof(header));
 
 	}
-
+	int raw_size()
+	{
+		return size;
+	}
+	u8* get_raw()
+	{
+		return this->raw;
+	}
 };
 
 #ifdef TEST
