@@ -14,6 +14,7 @@
 
 u8 buffer[524288];
 jbMgr jbMgr;
+Bbp bbp;
 
 // SANITY CHECKS
 typedef char test_item[sizeof(_JbMgrItem) == 312 ? 1 : -1];
@@ -154,8 +155,9 @@ Result DumpAllPacks()
 	return 0;
 }
 
-Result ImportPacks(int c=0)
+Result ImportPacks(int c)
 {
+	print("fuck");
 	Handle dirHandle;
 	if(c==0)
 	{
@@ -171,12 +173,14 @@ Result ImportPacks(int c=0)
 	u32 entriesRead = 0;
 	while (!FSDIR_Read(dirHandle, &entriesRead, 1, &entry) && entriesRead)
 	{
+		print("good so far ");
 		if (entry.attributes & FS_ATTRIBUTE_DIRECTORY) continue; // skip folders
 		if (strcmp(entry.shortExt, "BBP")) continue; // only read *.bbp
 		//myprintf("* %8s (%5llu B)... ", entry.shortName, entry.fileSize);
 		print("* ");
 		print(entry.name);
 		
+		print("\n");
 		Handle handle;
 		u16 bbpPath[300];
 		if(c==0)
@@ -245,7 +249,8 @@ Result ImportPacks(int c=0)
 					printRight("...customID full");
 					continue;
 				}
-				Bbp bbp;
+				myprintf("\n");
+				myprintf("\n");
 				bbp.init(buffer, entry.fileSize);
 				bbp.raw_to_bbp();
 				bbp.set_id(id);
@@ -426,7 +431,7 @@ int main()
 		{
 			if (!initialised) continue;
 			myprintf("Importing bbp files from sdmc://bbpimport/:\n");
-			ImportPacks();
+			ImportPacks(0);
 			ShowInstructions();
 		}
 		else if (hidKeysDown() & KEY_A)
