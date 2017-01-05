@@ -157,7 +157,14 @@ Result DumpAllPacks()
 Result ImportPacks(int c=0)
 {
 	Handle dirHandle;
+	if(c==0)
+	{
 	TRY(FSUSER_OpenDirectory(&dirHandle, sdmc_archive, fsMakePath(PATH_ASCII, "/bbpimport")), "Cannot find bbpimport directory");
+	}
+	else
+	{
+	TRY(FSUSER_OpenDirectory(&dirHandle, sdmc_archive, fsMakePath(PATH_ASCII, "/bbpimportc")), "Cannot find bbpimportc directory");
+	}
 	int fileCount = 0;
 	
 	FS_DirectoryEntry entry;
@@ -172,7 +179,14 @@ Result ImportPacks(int c=0)
 		
 		Handle handle;
 		u16 bbpPath[300];
-		ConcatUTF16(bbpPath, false, u"/bbpimport/", entry.name, NULL);
+		if(c==0)
+		{
+			ConcatUTF16(bbpPath, false, u"/bbpimport/", entry.name, NULL);
+		}
+		else
+		{
+			ConcatUTF16(bbpPath, false, u"/bbpimportc/", entry.name, NULL);
+		}
 		if (FSUSER_OpenFile(&handle, sdmc_archive, fsMakePath(PATH_UTF16, bbpPath), FS_OPEN_READ, 0))
 		{
 			printRight("...unable to open");
