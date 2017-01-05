@@ -48,6 +48,7 @@ int set_u16(u8 *buf,int index,int value)
 		memcpy((u8*)&item,raw,sizeof(item));
 		memcpy((u8*)&header,raw+sizeof(item)/*312*/,sizeof(header));
 		debugprintf("main start=%d ",header.main_start);
+		size_main=sizeof(main);
 		if ((res=gz_decompress2(main,&size_main,raw+sizeof(item)+header.main_start,header.main_size))!=0)
 		{
 			debugprintf("decompress main fail,res=%d",res);
@@ -55,6 +56,7 @@ int set_u16(u8 *buf,int index,int value)
 		}
 		if(header.has_vol==1)
 		{
+			size_vol=sizeof(vol);
 			if((res=gz_decompress2(vol,&size_vol,raw+sizeof(item)+header.vol_start,header.vol_size))!=0)
 			{
 				debugprintf("decompress vol fail,res=%d",res);
@@ -69,6 +71,7 @@ int set_u16(u8 *buf,int index,int value)
 		memset(raw,0,size);
 		memcpy(raw,(u8*)&item,sizeof(item));
 
+		header.main_size=sizeof(main);
 		if((res=gz_compress(raw+header.main_start+sizeof(item),&header.main_size,main,size_main)!=0))
 		{
 			debugprintf("gz_compress main fail,res=%d",res);
@@ -79,6 +82,7 @@ int set_u16(u8 *buf,int index,int value)
 		if(header.has_vol==1)
 		{
 			header.vol_start=align_to_4(header.main_start+header.main_size);
+			header.vol_size=sizeof(vol);
 			if((res=gz_compress(raw+header.vol_start+sizeof(item),&header.vol_size,vol,size_vol)!=0))
 			{
 				debugprintf("gz_compress vol fail,res=%d",res);
@@ -129,10 +133,15 @@ int main()
     Bbp bbp2;
     bbp2.init(bbp.get_raw(),bbp.raw_size());
     bbp2.raw_to_bbp();
+    bbp2.set_id(0x80000001);
     bbp2.bbp_to_raw();
     FILE *fp3=fopen("output2.bbp","wb");
     fwrite(bbp2.get_raw(),1,bbp2.raw_size(),fp3);
     fclose(fp3);
+
+    FILE *fp4=fopen("output.main","wb");
+    fwrite(bbp2.main,1,bbp2.size_main,fp4);
+    fclose(fp4);
 
 }
 #endif

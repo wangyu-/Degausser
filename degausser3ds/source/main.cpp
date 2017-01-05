@@ -14,6 +14,7 @@
 
 u8 buffer[524288];
 jbMgr jbMgr;
+Bbp bbp;
 
 // SANITY CHECKS
 typedef char test_item[sizeof(_JbMgrItem) == 312 ? 1 : -1];
@@ -245,7 +246,7 @@ Result ImportPacks(int c=0)
 					printRight("...customID full");
 					continue;
 				}
-				Bbp bbp;
+
 				bbp.init(buffer, entry.fileSize);
 				bbp.raw_to_bbp();
 				bbp.set_id(id);
