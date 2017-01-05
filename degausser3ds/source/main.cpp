@@ -10,7 +10,7 @@
 #include "glyph.cpp"
 
 #include "comm.h"
-
+#include "bbp_process.h"
 
 u8 buffer[524288];
 jbMgr jbMgr;
@@ -154,7 +154,7 @@ Result DumpAllPacks()
 	return 0;
 }
 
-Result ImportPacks()
+Result ImportPacks(int c=0)
 {
 	Handle dirHandle;
 	TRY(FSUSER_OpenDirectory(&dirHandle, sdmc_archive, fsMakePath(PATH_ASCII, "/bbpimport")), "Cannot find bbpimport directory");
@@ -188,6 +188,8 @@ Result ImportPacks()
 			FSFILE_Close(handle);
 			
 			_JbMgrItem* item = (_JbMgrItem*)buffer;
+			if(c==0)
+			{
 			if ((item->ID >> 16) == 0x8000)
 			{
 				// custom ID, do weird stuff
@@ -240,6 +242,11 @@ Result ImportPacks()
 				
 				printRight("...SUCCESS!");
 				fileCount++;
+			}
+			}
+			else //c=1;
+			{
+				;
 			}
 		}
 	}
@@ -347,6 +354,7 @@ void ShowInstructions()
 	{
 		myprintf("Press X to dump all BBP files(to /bbpdump/).\n");
 		myprintf("Press Y to import all BBP files(from /bbpimport/).\n");
+		myprintf("Press A to import all BBP files as custom(from /bbpimportc/).\n");
 		myprintf("Press SELECT to delete BBP files(according to /bbpdelete/).\n");
 	}
 	myprintf("Press START to exit.\n\n");
@@ -388,6 +396,13 @@ int main()
 			if (!initialised) continue;
 			myprintf("Importing bbp files from sdmc://bbpimport/:\n");
 			ImportPacks();
+			ShowInstructions();
+		}
+		else if (hidKeysDown() & KEY_A)
+		{
+			if (!initialised) continue;
+			myprintf("Importing bbp files from sdmc://bbpimportc/:\n");
+			ImportPacks(1);
 			ShowInstructions();
 		}
 		else if (hidKeysDown() & KEY_SELECT)
