@@ -260,14 +260,77 @@ Result ImportPacks()
 	return 0;
 }
 
+
+Result DeletePacks()
+{
+	Handle dirHandle;
+	TRY(FSUSER_OpenDirectory(&dirHandle, sdmc_archive, fsMakePath(PATH_ASCII, "/bbpimport")), "Cannot find bbpimport directory");
+	int fileCount = 0;
+
+	FS_DirectoryEntry entry;
+	u32 entriesRead = 0;
+	while (!FSDIR_Read(dirHandle, &entriesRead, 1, &entry) && entriesRead)
+	{
+		if (entry.attributes & FS_ATTRIBUTE_DIRECTORY) continue; // skip folders
+		if (strcmp(entry.shortExt, "BBP")) continue; // only read *.bbp
+		//myprintf("* %8s (%5llu B)... ", entry.shortName, entry.fileSize);
+		print("* ");
+		print(entry.name);
+
+		Handle handle;
+		u16 bbpPath[300];
+		ConcatUTF16(bbpPath, false, u"/bbpimport/", entry.name, NULL);
+		if (FSUSER_OpenFile(&handle, sdmc_archive, fsMakePath(PATH_UTF16, bbpPath), FS_OPEN_READ, 0))
+		{
+			printRight("...unable to open");
+		}
+		else if (entry.fileSize > 131072)
+		{
+			printRight("...file too large");
+			FSFILE_Close(handle);
+		}
+		else
+		{
+			FSFILE_Read(handle, NULL, 0, buffer, entry.fileSize);
+			FSFILE_Close(handle);
+
+			_JbMgrItem* item = (_JbMgrItem*)buffer;
+			for (int i = 0; i < 3700; i++)
+			{
+				if (jbMgr.Items[i].ID==item->ID)
+				{
+					memset((void*)jbMgr.Items+i,-1,sizeof(jbMgr.Items[i]));
+					fileCount++;
+				}
+			}
+		}
+	}
+
+	FSDIR_Close(dirHandle);
+
+	if (fileCount)
+	{
+		myprintf("Committing changes to /jb/mgr.bin...\n");
+		TRY(WriteJbMgr(), "ERROR: Could not modify /jb/mgr.bin\n");
+		myprintf("Imported %u bbp files from sdmc://bbpimport/.\n", fileCount);
+	}
+	else
+	{
+		myprintf("No changes were made to the extdata.\n");
+	}
+
+	return 0;
+}
+
 bool initialised = false;
 void ShowInstructions()
 {
 	myprintf("\n");
 	if (initialised)
 	{
-		myprintf("Press X to dump all BBP files.\n");
-		myprintf("Press Y to import all BBP files.\n");
+		myprintf("Press X to dump all BBP files(to /bbpdump/).\n");
+		myprintf("Press Y to import all BBP files(from /bbpimport/).\n");
+		myprintf("Press SELECT to delete BBP files(according to /bbpdelete/).\n");
 	}
 	myprintf("Press START to exit.\n\n");
 }
@@ -310,6 +373,14 @@ int main()
 			ImportPacks();
 			ShowInstructions();
 		}
+		else if (hidKeysDown() & KEY_SELECT)
+		{
+			if (!initialised) continue;
+			myprintf("deleting:\n");
+			DeletePacks();
+			ShowInstructions();
+		}
+
 		else if (hidKeysDown() & KEY_START) break;
 	}
 	
