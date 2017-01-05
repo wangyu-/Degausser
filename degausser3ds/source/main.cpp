@@ -12,6 +12,8 @@
 #include "comm.h"
 
 
+u8 buffer[1024*1024];
+
 u32 extdata_archive_lowpathdata[3] = {MEDIATYPE_SD, 0xa0b, 0};
 FS_Archive extdata_archive = {ARCHIVE_EXTDATA, {PATH_BINARY, 0xC, &extdata_archive_lowpathdata}};
 FS_Archive sdmc_archive = {ARCHIVE_SDMC, {PATH_ASCII, 1, ""}};
@@ -255,7 +257,7 @@ void ShowInstructions()
 	myprintf("Press START to exit.\n\n");
 }
 
-u8 buff[1024*1024];
+
 int main()
 {
 	// Initialize services
