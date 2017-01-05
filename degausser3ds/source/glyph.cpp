@@ -1,6 +1,7 @@
 #include <string.h>
 #include <3ds.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 extern u32 glyphs[6756][6];
 
