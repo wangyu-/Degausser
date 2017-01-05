@@ -12,9 +12,10 @@ int get_u32(u8 *buf,int index)
 {
 
 }
-int set_u32(u8 *buf,int index,int value)
+int set_u32(u8 *buf,int index,u32 value)
 {
-
+	*((u32*)(buf+index))=value;
+	return 0;
 }
 int get_u16(u8 *buf,int index)
 {
@@ -52,6 +53,12 @@ struct Bbp
 		for(u32 i=0;i<size;i++)
 			raw[i]=buf[i];
 		this->size=size;
+		return 0;
+	}
+	int set_id(u32 id)
+	{
+		item.ID=id;
+		set_u32(main,4,id);
 		return 0;
 	}
 	int raw_to_bbp()

@@ -77,7 +77,7 @@ int FindSongID(u32 id)
 	return -1;
 }
 
-/*
+
 // Find the earliest unused customID (0x8000????) in jbMgr
 u32 GetEarliestCustomID()
 {
@@ -94,7 +94,7 @@ u32 GetEarliestCustomID()
 	}
 	return -1;
 }
-*/
+
 
 Result DumpAllPacks()
 {
@@ -184,12 +184,14 @@ Result ImportPacks(int c=0)
 		}
 		else
 		{
+			int size=entry.fileSize;
 			FSFILE_Read(handle, NULL, 0, buffer, entry.fileSize);
 			FSFILE_Close(handle);
 			
-			_JbMgrItem* item = (_JbMgrItem*)buffer;
+
 			if(c==0)
 			{
+				_JbMgrItem* item = (_JbMgrItem*)buffer;
 			if ((item->ID >> 16) == 0x8000)
 			{
 				// custom ID, do weird stuff
@@ -212,42 +214,57 @@ Result ImportPacks(int c=0)
 				}
 				*/
 				printRight("...customID error");
+				continue;
 			}
 			else if (FindSongID(item->ID) != -1)
 			{
 				printRight("...already exists");
-			}
-			else
-			{
-				//int index = FindEmptySlot();
-				int index = FindSongID(-1);
-				if (index == -1)
-				{
-					// THERE IS NO EMPTY SLOT!!!
-				}
-				
-				char packPath[32];
-				sprintf(packPath, "/jb/gak/%08lx", item->ID);
-				FSUSER_CreateDirectory(extdata_archive, fsMakePath(PATH_ASCII, packPath), 0);
-				strcat(packPath, "/pack");
-				
-				FS_Path fsPath = fsMakePath(PATH_ASCII, packPath);
-				FSUSER_CreateFile(extdata_archive, fsPath, 0, entry.fileSize - 312);
-				FSUSER_OpenFile(&handle, extdata_archive, fsPath, FS_OPEN_WRITE, 0);
-				FSFILE_Write(handle, NULL, 0, buffer + 312, entry.fileSize - 312, FS_WRITE_FLUSH);
-				FSFILE_Close(handle);
-				
-				// TODO: CHECK FIRST THAT PACK WAS SUCCESSFULLY CREATED!?
-				jbMgr.Items[index] = *item;
-				
-				printRight("...SUCCESS!");
-				fileCount++;
+				continue;
 			}
 			}
 			else //c=1;
 			{
-				;
+				int id=GetEarliestCustomID();
+				if(id==-1)
+				{
+					//full
+					printRight("...customID full");
+					continue;
+				}
+				Bbp bbp;
+				bbp.init(buffer, entry.fileSize);
+				bbp.raw_to_bbp();
+				bbp.set_id(id);
+				bbp.bbp_to_raw();
+				memcpy(buffer,bbp.get_raw(),bbp.raw_size());
+				size=bbp.raw_size();
+				_JbMgrItem* item = (_JbMgrItem*)buffer;
 			}
+			//int index = FindEmptySlot();
+			int index = FindSongID(-1);
+			if (index == -1)
+			{
+				// THERE IS NO EMPTY SLOT!!!
+				printRight("...no empty slot");
+				continue;
+			}
+
+			char packPath[32];
+			sprintf(packPath, "/jb/gak/%08lx", item->ID);
+			FSUSER_CreateDirectory(extdata_archive, fsMakePath(PATH_ASCII, packPath), 0);
+			strcat(packPath, "/pack");
+
+			FS_Path fsPath = fsMakePath(PATH_ASCII, packPath);
+			FSUSER_CreateFile(extdata_archive, fsPath, 0, size - 312);
+			FSUSER_OpenFile(&handle, extdata_archive, fsPath, FS_OPEN_WRITE, 0);
+			FSFILE_Write(handle, NULL, 0, buffer + 312, entry.size - 312, FS_WRITE_FLUSH);
+			FSFILE_Close(handle);
+
+			// TODO: CHECK FIRST THAT PACK WAS SUCCESSFULLY CREATED!?
+			jbMgr.Items[index] = *item;
+
+			printRight("...SUCCESS!");
+			fileCount++;
 		}
 	}
 	
