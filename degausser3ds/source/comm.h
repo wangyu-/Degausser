@@ -50,7 +50,7 @@ typedef s32 Result;
 #endif
 
 
-void debugprintf(char* fmt, ...);
+void debugprintf(const char* fmt, ...);
 
 void print(char* str);
 void print(u16* str);

@@ -13,7 +13,7 @@ void glyphExit();
 
 void print(char* str);
 void print(u16* str);
-void myprintf(char* fmt, ...);
+void myprintf(const char* fmt, ...);
 
 #define TRY(item, str) if (item) { myprintf(str "\n"); return -1; }
 #define TRYCONT(item, str) if (item) { myprintf(str "\n"); continue; }
@@ -108,7 +108,7 @@ void printRight(char* str)
 	glyphWait();
 }
 
-void myprintf(char* fmt, ...)
+void myprintf(const char* fmt, ...)
 {
 	char buffer[256];
 	va_list args;
