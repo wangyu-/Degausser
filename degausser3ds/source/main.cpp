@@ -257,7 +257,7 @@ Result ImportPacks(int c=0)
 			FS_Path fsPath = fsMakePath(PATH_ASCII, packPath);
 			FSUSER_CreateFile(extdata_archive, fsPath, 0, size - 312);
 			FSUSER_OpenFile(&handle, extdata_archive, fsPath, FS_OPEN_WRITE, 0);
-			FSFILE_Write(handle, NULL, 0, buffer + 312, entry.size - 312, FS_WRITE_FLUSH);
+			FSFILE_Write(handle, NULL, 0, buffer + 312, size - 312, FS_WRITE_FLUSH);
 			FSFILE_Close(handle);
 
 			// TODO: CHECK FIRST THAT PACK WAS SUCCESSFULLY CREATED!?

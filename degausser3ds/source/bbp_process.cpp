@@ -1,5 +1,5 @@
 #include "comm.h"
-
+#include "bbp_process.h"
 
 u32 align_to_4(u32 a)
 {
@@ -25,28 +25,9 @@ int set_u16(u8 *buf,int index,int value)
 {
 
 }
-struct Header
-{
-	u32 unused[3];
-	u32 main_start;//3
-	u32 main_size;//4
-	u32 has_vol;//5
-	u32 unused2;//vocal id?
-	u32 vol_start;//7
-	u32 vol_size;//8
-	u32 unused3[8];
-};
-struct Bbp
-{
-	u8 raw[1024*1024];
-	u32 size;
-	_JbMgrItem item;
-	Header header;
-	u8 main[1024*1024];
-	u32 size_main;
-	u8 vol[1024*1024];
-	u32 size_vol;
-	int init(u8 * buf,u32 size)
+
+
+	int Bbp:: init(u8 * buf,u32 size)
 	{
 		if(size >sizeof(raw))
 			return -1;
@@ -55,13 +36,13 @@ struct Bbp
 		this->size=size;
 		return 0;
 	}
-	int set_id(u32 id)
+	int Bbp:: set_id(u32 id)
 	{
 		item.ID=id;
 		set_u32(main,4,id);
 		return 0;
 	}
-	int raw_to_bbp()
+	int Bbp:: raw_to_bbp()
 	{
 		int res;
 		memcpy((u8*)&item,raw,sizeof(item));
@@ -82,7 +63,7 @@ struct Bbp
 		}
 		return 0;
 	}
-	int bbp_to_raw()
+	int Bbp:: bbp_to_raw()
 	{
 		int res;
 		memset(raw,0,size);
@@ -108,15 +89,14 @@ struct Bbp
 		memcpy(raw+sizeof(item)/*312*/,(u8*)&header,sizeof(header));
 
 	}
-	int raw_size()
+	int Bbp:: raw_size()
 	{
 		return size;
 	}
-	u8* get_raw()
+	u8* Bbp:: get_raw()
 	{
 		return this->raw;
 	}
-};
 
 #ifdef TEST
 u8 buffer[524288];
