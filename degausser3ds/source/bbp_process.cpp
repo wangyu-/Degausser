@@ -1,7 +1,10 @@
 #include "comm.h"
 
 
-
+u32 align_to_4(u32 a)
+{
+	return (a+3)&(~3);
+}
 
 
 
@@ -87,12 +90,12 @@ struct Bbp
 
 		if(header.has_vol==1)
 		{
+			header.vol_start=align_to_4(header.main_start+header.main_size);
 			if((res=gz_compress(raw+header.vol_start+sizeof(item),&header.vol_size,vol,size_vol)!=0))
 			{
 				debugprintf("gz_compress vol fail,res=%d",res);
 				return -1;
 			}
-			header.vol_start=header.main_start+header.main_size;
 			size=header.vol_start+sizeof(item)+header.vol_size;
 		}
 		memcpy(raw+sizeof(item)/*312*/,(u8*)&header,sizeof(header));
@@ -134,6 +137,15 @@ int main()
     FILE *fp2=fopen("output.bbp","wb");
     fwrite(bbp.get_raw(),1,bbp.raw_size(),fp2);
     fclose(fp2);
+
+
+    Bbp bbp2;
+    bbp2.init(bbp.get_raw(),bbp.raw_size());
+    bbp2.raw_to_bbp();
+    bbp2.bbp_to_raw();
+    FILE *fp3=fopen("output2.bbp","wb");
+    fwrite(bbp2.get_raw(),1,bbp2.raw_size(),fp3);
+    fclose(fp3);
 
 }
 #endif
