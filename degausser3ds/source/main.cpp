@@ -135,8 +135,8 @@ Result DumpAllPacks()
 		FSFILE_Close(handle);
 		
 		// dump contents of buffer to "/bbpdump/<title> (<author>).bbp"
-		char tmp_id[10];
-		sprintf(tmp_id,"%08X-",item->ID);
+		unsigned char tmp_id[10];
+		sprintf((char*)tmp_id,"%08X-",item->ID);
 		u16 tmp_id2[10];
 		for(int j=0;j<10;j++)
 			tmp_id2=tmp_id;
