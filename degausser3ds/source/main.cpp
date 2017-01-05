@@ -53,7 +53,7 @@ Result WriteJbMgr()
 	u32 compLen = sizeof(buffer);
 	TRY(gz_compress(buffer, &compLen, (u8 *)&jbMgr, sizeof(jbMgr)), "Unable to compress jbMgr");
 	
-	char* paths[2] = {"/jb/mgr.bin", "/jb/mgr_.bin"};
+	const char* paths[2] = {"/jb/mgr.bin", "/jb/mgr_.bin"};
 	for (int i = 0; i < 2; i++)
 	{
 		Handle handle;
