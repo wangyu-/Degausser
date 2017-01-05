@@ -56,17 +56,17 @@ struct Bbp
 		int res;
 		memcpy((u8*)&item,raw,sizeof(item));
 		memcpy((u8*)&header,raw+sizeof(item)/*312*/,sizeof(header));
-		testprintf("main start=%d ",header.main_start);
+		debugprintf("main start=%d ",header.main_start);
 		if ((res=gz_decompress2(main,&size_main,raw+sizeof(item)+header.main_start,header.main_size))!=0)
 		{
-			testprintf("decompress main fail,res=%d",res);
+			debugprintf("decompress main fail,res=%d",res);
 			return -1;
 		}
 		if(header.has_vol==1)
 		{
 			if((res=gz_decompress2(vol,&size_vol,raw+sizeof(item)+header.vol_start,header.vol_size))!=0)
 			{
-				testprintf("decompress vol fail,res=%d",res);
+				debugprintf("decompress vol fail,res=%d",res);
 				return -1;
 			}
 		}
@@ -80,7 +80,7 @@ struct Bbp
 
 		if((res=gz_compress(raw+header.main_start+sizeof(item),&header.main_size,main,size_main)!=0))
 		{
-			testprintf("gz_compress main fail,res=%d",res);
+			debugprintf("gz_compress main fail,res=%d",res);
 			return -1;
 		}
 		size=header.main_start+sizeof(item)+header.main_size;
@@ -89,7 +89,7 @@ struct Bbp
 		{
 			if((res=gz_compress(raw+header.vol_start+sizeof(item),&header.vol_size,vol,size_vol)!=0))
 			{
-				testprintf("gz_compress vol fail,res=%d",res);
+				debugprintf("gz_compress vol fail,res=%d",res);
 				return -1;
 			}
 			header.vol_start=header.main_start+header.main_size;
