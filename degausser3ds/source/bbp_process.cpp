@@ -104,9 +104,14 @@ int set_u16(u8 *buf,int index,int value)
 
 #ifdef TEST
 u8 buffer[524288];
+Bbp bbp;
+Bbp bbp2;
 int main()
 {
+	printf("asdasd");
+	fflush(stdout);
 	printf("%d ",sizeof(_JbMgrItem));
+	fflush(stdout);
 	u8 buf[1024*1024];
 	FILE *fp;
 	int size;
@@ -117,7 +122,7 @@ int main()
     size= ftell (fp);
     rewind (fp);
     fread (buf,1,size,fp);
-    Bbp bbp;
+
     printf("good so far @%d",__LINE__);
     fflush(stdout);
     bbp.init(buf,size);
@@ -130,7 +135,7 @@ int main()
     fclose(fp2);
 
 
-    Bbp bbp2;
+
     bbp2.init(bbp.get_raw(),bbp.raw_size());
     bbp2.raw_to_bbp();
     bbp2.set_id(0x80000001);
