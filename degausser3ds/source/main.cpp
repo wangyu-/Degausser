@@ -347,7 +347,8 @@ Result DeletePacks()
 
 				if (jbMgr.Items[i].ID==item->ID)
 				{
-					memset((void*)(jbMgr.Items+i),-1,sizeof(jbMgr.Items[i]));
+					memset((void*)(jbMgr.Items+i),0,sizeof(jbMgr.Items[i]));
+					jbMgr.Items[i].ID=-1;
 					fileCount++;
 					char packPath[32];
 					sprintf(packPath, "/jb/gak/%08lx", item->ID);
@@ -372,7 +373,7 @@ Result DeletePacks()
 	{
 		myprintf("Committing changes to /jb/mgr.bin...\n");
 		TRY(WriteJbMgr(), "ERROR: Could not modify /jb/mgr.bin\n");
-		myprintf("Imported %u bbp files from sdmc://bbpimport/.\n", fileCount);
+		myprintf("Idelete %u bbp files in sdmc://bbpimport/.\n", fileCount);
 	}
 	else
 	{
