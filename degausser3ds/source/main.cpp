@@ -295,6 +295,7 @@ Result DeletePacks()
 			FSFILE_Close(handle);
 
 			_JbMgrItem* item = (_JbMgrItem*)buffer;
+			int cnt=0;
 			for (int i = 0; i < 3700; i++)//not really very slow.....
 			{
 				if (jbMgr.Items[i].ID == (u32)-1) continue; // id != -1 for the item to be valid
@@ -305,16 +306,20 @@ Result DeletePacks()
 				{
 					memset((void*)(jbMgr.Items+i),-1,sizeof(jbMgr.Items[i]));
 					fileCount++;
+					char packPath[32];
+					sprintf(packPath, "/jb/gak/%08lx", item->ID);
+					if(FSUSER_DeleteDirectoryRecursively(extdata_archive, fsMakePath(PATH_ASCII, packPath)))
+					{
+						printRight("delete dir ");
+						printRight(packPath);
+						printRight(" fail!");
+					}
+					cnt++;
+					printRight("...SUCCESS!");
 				}
-				char packPath[32];
-				sprintf(packPath, "/jb/gak/%08lx", item->ID);
-				if(FSUSER_DeleteDirectoryRecursively(extdata_archive, fsMakePath(PATH_ASCII, packPath)))
-				{
-					printRight("delete dir ");
-					printRight(packPath);
-					printRight(" fail!");
-				}
+
 			}
+			if(cnt==0) printRight("...not found!");
 		}
 	}
 
