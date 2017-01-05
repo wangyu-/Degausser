@@ -12,6 +12,10 @@
 #include "comm.h"
 #include "bbp_process.h"
 
+#include <map>
+#include <set>
+using namespace std;
+
 u8 buffer[524288];
 JbMgr jbMgr;
 Bbp bbp;
@@ -19,7 +23,7 @@ Bbp bbp;
 // SANITY CHECKS
 typedef char test_item[sizeof(_JbMgrItem) == 312 ? 1 : -1];
 typedef char test_jbmgr[sizeof(jbMgr) == 1154408 ? 1 : -1];
-typedef char test_jbmgr2[sizeof(PackHeader) == 68 ? 1 : -1];
+typedef char test2_jbmgr[sizeof(PackHeader) == 68 ? 1 : -1];
 
 // archive-related stuff
 
@@ -339,8 +343,8 @@ Result DeletePacks()
 			_JbMgrItem* item = (_JbMgrItem*)buffer;
 			if ((item->ID >> 16) == 0x8000)
 			{
-				myprintf("%lx",item->ID);
-				myprintf("<%lx>",(item->ID >> 16) );
+				//myprintf("%lx",item->ID);
+				//myprintf("<%lx>",(item->ID >> 16) );
 				//printRight(" skiped custom song");
 				//continue;
 			}
@@ -360,9 +364,9 @@ Result DeletePacks()
 					sprintf(packPath, "/jb/gak/%08lx", item->ID);
 					if(FSUSER_DeleteDirectoryRecursively(extdata_archive, fsMakePath(PATH_ASCII, packPath)))
 					{
-						printRight("delete dir ");
-						printRight(packPath);
-						printRight(" fail!");
+						myprintf("\ndelete dir %s fail!\n",packPath);
+						printRight("...part SUCCESS!");
+						continue;
 					}
 					cnt++;
 					printRight("...SUCCESS!");
