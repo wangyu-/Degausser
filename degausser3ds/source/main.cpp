@@ -188,10 +188,10 @@ Result ImportPacks(int c=0)
 			FSFILE_Read(handle, NULL, 0, buffer, entry.fileSize);
 			FSFILE_Close(handle);
 			
-
+			_JbMgrItem* item;
 			if(c==0)
 			{
-				_JbMgrItem* item = (_JbMgrItem*)buffer;
+			item = (_JbMgrItem*)buffer;
 			if ((item->ID >> 16) == 0x8000)
 			{
 				// custom ID, do weird stuff
