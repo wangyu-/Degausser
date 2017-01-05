@@ -64,12 +64,12 @@ typedef struct
 	u8  Scores[50];
 } _JbMgrItem;
 
-struct
+struct jbMgr
 {
 	u32 Magic;
 	u16 Version, Count;
 	_JbMgrItem Items[3700];
-} jbMgr;
+};
 
 typedef struct
 {
@@ -90,12 +90,12 @@ static const u8 gzip_header[10] = { 0x1F, 0x8B, 0x08, 0x00, 0x00, 0x00, 0x00, 0x
 void ConcatUTF16(u16* dst, bool sanitizeFirst, ...);
 
 
-Result gz_compress(void* dst, u32* dstLen, const void* src, u32 srcLen);
+Result gz_compress(u8* dst, u32* dstLen, const u8* src, u32 srcLen);
 
 
-Result gz_decompress(void* dst, u32 dstLen, const void* src, u32 srcLen);
+Result gz_decompress(u8* dst, u32 dstLen, const u8* src, u32 srcLen);
 
 
-Result gz_decompress2(void* dst, u32* dstLen, const void* src, u32 srcLen);
+Result gz_decompress2(u8* dst, u32* dstLen, const u8* src, u32 srcLen);
 
 #endif /* DEGAUSSER3DS_SOURCE_COMM_H_ */

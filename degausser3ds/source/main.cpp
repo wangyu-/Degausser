@@ -13,6 +13,7 @@
 
 
 u8 buffer[524288];
+jbMgr jbMgr;
 
 // SANITY CHECKS
 typedef char test_item[sizeof(_JbMgrItem) == 312 ? 1 : -1];

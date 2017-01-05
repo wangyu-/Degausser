@@ -11,7 +11,7 @@
 
 #ifdef TEST
 
-void debugprintf(char* fmt, ...)
+void debugprintf(const char* fmt, ...)
 {
 	va_list args;
 	va_start(args,fmt);
@@ -23,7 +23,7 @@ void debugprintf(char* fmt, ...)
 
 
 
-void debugprintf(char* fmt, ...)
+void debugprintf(const char* fmt, ...)
 {
 	va_list args;
 	va_start(args,fmt);
@@ -54,7 +54,7 @@ void ConcatUTF16(u16* dst, bool sanitizeFirst, ...)
 	*dst = 0;
 }
 
-Result gz_compress(void* dst, u32* dstLen, const void* src, u32 srcLen)
+Result gz_compress(u8* dst, u32* dstLen, const u8* src, u32 srcLen)
 {
 	memcpy(dst, gzip_header, 10);
 	if (!(*dstLen = tdefl_compress_mem_to_mem(dst + 10, *dstLen - 18, src, srcLen, 0x300))) return -1; // ERROR COMPRESSING
@@ -64,7 +64,7 @@ Result gz_compress(void* dst, u32* dstLen, const void* src, u32 srcLen)
 	return 0;
 }
 
-Result gz_decompress(void* dst, u32 dstLen, const void* src, u32 srcLen)
+Result gz_decompress(u8* dst, u32 dstLen, const u8* src, u32 srcLen)
 {
 	if (memcmp(src, gzip_header, 10)) return -1; // GZIP HEADER ERROR
 	if (dstLen != *(u32*)(src + srcLen - 4)) return -2; // UNEXPECTED LENGTH
@@ -73,7 +73,7 @@ Result gz_decompress(void* dst, u32 dstLen, const void* src, u32 srcLen)
 	return 0;
 }
 
-Result gz_decompress2(void* dst, u32* dstLen, const void* src, u32 srcLen)
+Result gz_decompress2(u8* dst, u32* dstLen, const u8* src, u32 srcLen)
 {
 	*dstLen=*(u32*)(src + srcLen - 4);
 	return gz_decompress(dst,*dstLen,src,srcLen);

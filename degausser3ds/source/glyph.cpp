@@ -5,13 +5,13 @@
 
 extern u32 glyphs[6756][6];
 
-void printRight(char* str);
+void printRight(const char* str);
 //#define print(STR) _Generic((STR), char*: print8, u16*: print16)(STR)
 void glyphInit();
 void glyphWait();
 void glyphExit();
 
-void print(char* str);
+void print(const char* str);
 void print(u16* str);
 void myprintf(const char* fmt, ...);
 
@@ -96,10 +96,10 @@ void printChar(u16 c)
 	}
 }
 
-void print(char* str) { while (*str) printChar(*str++); glyphWait(); }
+void print(const char* str) { while (*str) printChar(*str++); glyphWait(); }
 void print(u16* str) { while (*str) printChar(*str++); glyphWait(); }
 
-void printRight(char* str)
+void printRight(const char* str)
 {
 	curX = 53 - strlen(str);
 	if (curX < 0) curX = 0;
