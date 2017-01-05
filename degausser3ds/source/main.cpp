@@ -279,7 +279,7 @@ Result DeletePacks()
 
 		Handle handle;
 		u16 bbpPath[300];
-		ConcatUTF16(bbpPath, false, u"/bbpimport/", entry.name, NULL);
+		ConcatUTF16(bbpPath, false, u"/bbpdelete/", entry.name, NULL);
 		if (FSUSER_OpenFile(&handle, sdmc_archive, fsMakePath(PATH_UTF16, bbpPath), FS_OPEN_READ, 0))
 		{
 			printRight("...unable to open");
