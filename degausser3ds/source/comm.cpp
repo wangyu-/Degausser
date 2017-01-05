@@ -64,6 +64,7 @@ Result gz_compress(u8* dst, u32* dstLen, const u8* src, u32 srcLen)
 	return 0;
 }
 
+
 Result gz_decompress(u8* dst, u32 dstLen, const u8* src, u32 srcLen)
 {
 	if (memcmp(src, gzip_header, 10)) return -1; // GZIP HEADER ERROR
@@ -75,6 +76,7 @@ Result gz_decompress(u8* dst, u32 dstLen, const u8* src, u32 srcLen)
 
 Result gz_decompress2(u8* dst, u32* dstLen, const u8* src, u32 srcLen)
 {
+	if(*(u32*)(src + srcLen - 4) > *dstLen) return -100;//not enough size
 	*dstLen=*(u32*)(src + srcLen - 4);
 	return gz_decompress(dst,*dstLen,src,srcLen);
 }
