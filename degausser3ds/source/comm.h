@@ -83,13 +83,6 @@ typedef struct
 static const u8 gzip_header[10] = { 0x1F, 0x8B, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03 };
 
 
-// SANITY CHECKS
-typedef char test_item[sizeof(_JbMgrItem) == 312 ? 1 : -1];
-typedef char test_jbmgr[sizeof(jbMgr) == 1154408 ? 1 : -1];
-typedef char test_jbmgr[sizeof(PackHeader) == 68 ? 1 : -1];
-
-// archive-related stuff
-
 
 
 
