@@ -139,7 +139,7 @@ Result DumpAllPacks()
 		sprintf((char*)tmp_id,"%08X-",item->ID);
 		u16 tmp_id2[10];
 		for(int j=0;j<10;j++)
-			tmp_id2=tmp_id;
+			tmp_id2=(u16)tmp_id;
 		u16 bbpPath[128];
 		ConcatUTF16(bbpPath, false, u"/bbpdump/", tmp_id2,item->Title, u" (", item->Author, u").bbp", NULL);
 		TRYCONT(FSUSER_OpenFile(&handle, sdmc_archive, fsMakePath(PATH_UTF16, bbpPath), FS_OPEN_CREATE | FS_OPEN_WRITE, 0), "Unable to create bbp file");
