@@ -264,7 +264,7 @@ Result ImportPacks()
 Result DeletePacks()
 {
 	Handle dirHandle;
-	TRY(FSUSER_OpenDirectory(&dirHandle, sdmc_archive, fsMakePath(PATH_ASCII, "/bbpimport")), "Cannot find bbpimport directory");
+	TRY(FSUSER_OpenDirectory(&dirHandle, sdmc_archive, fsMakePath(PATH_ASCII, "/bbpdelete")), "Cannot find bbpimport directory");
 	int fileCount = 0;
 
 	FS_DirectoryEntry entry;
@@ -295,12 +295,24 @@ Result DeletePacks()
 			FSFILE_Close(handle);
 
 			_JbMgrItem* item = (_JbMgrItem*)buffer;
-			for (int i = 0; i < 3700; i++)
+			for (int i = 0; i < 3700; i++)//not really very slow.....
 			{
+				if (jbMgr.Items[i].ID == (u32)-1) continue; // id != -1 for the item to be valid
+				if (!(jbMgr.Items[i].Flags & 1)) continue; // bit0 == 1 to be valid
+				if (!(jbMgr.Items[i].Flags & 2)) continue; // bit1 == 1 for pack to be stored on SD
+
 				if (jbMgr.Items[i].ID==item->ID)
 				{
 					memset((void*)(jbMgr.Items+i),-1,sizeof(jbMgr.Items[i]));
 					fileCount++;
+				}
+				char packPath[32];
+				sprintf(packPath, "/jb/gak/%08lx", item->ID);
+				if(FSUSER_DeleteDirectoryRecursively(extdata_archive, fsMakePath(PATH_ASCII, packPath)))
+				{
+					printRight("delete dir ");
+					printRight(packPath);
+					printRight(" fail!");
 				}
 			}
 		}
