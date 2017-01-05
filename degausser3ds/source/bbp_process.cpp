@@ -75,6 +75,7 @@ struct Bbp
 	int bbp_to_raw()
 	{
 		int res;
+		memset(raw,0,size);
 		memcpy(raw,(u8*)&item,sizeof(item));
 
 		if((res=gz_compress(raw+header.main_start+sizeof(item),&header.main_size,main,size_main)!=0))
@@ -82,7 +83,7 @@ struct Bbp
 			testprintf("gz_compress main fail,res=%d",res);
 			return -1;
 		}
-		size=raw+header.main_start+sizeof(item)+header.main_size;
+		size=header.main_start+sizeof(item)+header.main_size;
 
 		if(header.has_vol==1)
 		{
@@ -92,7 +93,7 @@ struct Bbp
 				return -1;
 			}
 			header.vol_start=header.main_start+header.main_size;
-			size=raw+header.vol_start+sizeof(item)+header.vol_size;
+			size=header.vol_start+sizeof(item)+header.vol_size;
 		}
 		memcpy(raw+sizeof(item)/*312*/,(u8*)&header,sizeof(header));
 
@@ -123,12 +124,16 @@ int main()
     rewind (fp);
     fread (buf,1,size,fp);
     Bbp bbp;
-    printf("good so far");
+    printf("good so far @%d",__LINE__);
     fflush(stdout);
     bbp.init(buf,size);
-    printf("good so far2");
+    printf("good so far @%d",__LINE__);
     fflush(stdout);
     bbp.raw_to_bbp();
+    bbp.bbp_to_raw();
+    FILE *fp2=fopen("output.bbp","wb");
+    fwrite(bbp.get_raw(),1,bbp.raw_size(),fp2);
+    fclose(fp2);
 
 }
 #endif
