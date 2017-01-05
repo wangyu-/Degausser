@@ -338,6 +338,11 @@ Result DeletePacks()
 			FSFILE_Close(handle);
 
 			_JbMgrItem* item = (_JbMgrItem*)buffer;
+			if ((item->ID >> 16) == 0x8000)
+			{
+				printRight(" skiped custom song");
+				continue;
+			}
 			int cnt=0;
 			for (int i = 0; i < 3700; i++)//not really very slow.....
 			{
