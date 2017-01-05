@@ -21,7 +21,7 @@
 
 
 
-#define TEST
+//#define TEST
 
 
 
@@ -50,7 +50,7 @@ typedef s32 Result;
 #endif
 
 
-void testprintf(char* fmt, ...);
+void debugprintf(char* fmt, ...);
 
 void print(char* str);
 void print(u16* str);

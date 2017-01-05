@@ -11,7 +11,7 @@
 
 #ifdef TEST
 
-void testprintf(char* fmt, ...)
+void debugprintf(char* fmt, ...)
 {
 	va_list args;
 	va_start(args,fmt);
@@ -23,7 +23,7 @@ void testprintf(char* fmt, ...)
 
 
 
-void testprintf(char* fmt, ...)
+void debugprintf(char* fmt, ...)
 {
 	va_list args;
 	va_start(args,fmt);
