@@ -299,7 +299,7 @@ Result DeletePacks()
 			{
 				if (jbMgr.Items[i].ID==item->ID)
 				{
-					memset((void*)jbMgr.Items+i,-1,sizeof(jbMgr.Items[i]));
+					memset((void*)(jbMgr.Items+i),-1,sizeof(jbMgr.Items[i]));
 					fileCount++;
 				}
 			}
