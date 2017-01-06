@@ -54,7 +54,7 @@ void ConcatUTF16(u16* dst, bool sanitizeFirst, ...)
 	*dst = 0;
 }
 
-Result gz_compress(u8* dst, u32* dstLen, const u8* src, u32 srcLen)
+Result gz_compress(u8* dst, u32* dstLen, const u8* src, u32 srcLen)//dstLen specify dst size when pass in,specify data size when pass out
 {
 	memcpy(dst, gzip_header, 10);
 	if (!(*dstLen = tdefl_compress_mem_to_mem(dst + 10, *dstLen - 18, src, srcLen, 0x300))) return -1; // ERROR COMPRESSING

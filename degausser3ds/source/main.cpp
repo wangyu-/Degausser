@@ -18,7 +18,78 @@ using namespace std;
 
 u8 buffer[524288];
 JbMgr jbMgr;
-Bbp bbp;
+fBbp bbp;
+
+struct JbMgrWithIndex
+{
+	JbMgr jbMgr;
+	set<u32> empty_slots;
+	set<u32> unused_custom_id;
+	map<u32,u32> used_id;
+	int from_raw(u8* buf,u32 size)
+	{
+		empty_slots.clear();
+		unused_custom_id.clear();
+		used_id.clear();
+
+		TRY(gz_decompress((u8 *)&jbMgr, sizeof(jbMgr), buf, size), "Unable to decompress jbMgr");
+		for (int i = 0; i < 3700; i++)
+		{
+			if (jbMgr.Items[i].ID == (u32)-1) continue;
+			empty_slots.insert(jbMgr.Items[i].ID);
+		}
+		bool used[3700] = {};
+		for (int i = 0; i < 3700; i++)
+		{
+			u32 id = jbMgr.Items[i].ID;
+			if(id!=(u32)-1)
+			{
+				if(used_id.find(id)!=used_id.end())
+				{
+					myprintf("\n duplicate id in jbmgr.bin!!");
+					return -1;
+				}
+				used_id.insert(pair<u32,u32>(id,i));
+			}
+			if ((id >> 16) == 0x8000) used[id & 0xFFFF] = true;
+		}
+		for (int i = 0; i < 3700; i++)
+		{
+			if (!used[i])  unused_custom_id.insert(0x80000000 | i);
+		}
+		return 0;
+	}
+	int to_raw(u8* buf,u32 *size)
+	{
+		u32 compLen = sizeof(buffer);
+		TRY(gz_compress(buffer, size, (u8 *)&jbMgr, sizeof(jbMgr)), "Unable to compress jbMgr");
+		return 0;
+	}
+	int insert(_JbMgrItem *item)//can also insert custom song,just wont change id
+	{
+		u32 id=item->ID;
+		TRY(used_id.find(id)==used_id.end(),"id already exist");
+		if(id>>32==(u32)0x8000) unused_custom_id.erase(unused_custom_id.find(id));
+		TRY(empty_slots.size()==0,"\n jbmgr full!");
+		s32 idx=*empty_slots.begin();
+		empty_slots.erase(empty_slots.begin());
+		jbMgr.Items[idx]=*item;
+		used_id[id]=idx;
+		return 0;
+	}
+	u32 get_an_unused_custom_id()
+	{
+		TRY(unused_custom_id.size()==0,"\n jbmgr full!");
+		return *unused_custom_id.begin();
+	}
+	int delete_by_id(u32 id)
+	{
+		TRY(id=(u32)-1,"invaild id:-1");
+
+		return 0;
+	}
+}JbMgrIdx;
+
 
 // SANITY CHECKS
 typedef char test_item[sizeof(_JbMgrItem) == 312 ? 1 : -1];
@@ -252,8 +323,7 @@ Result ImportPacks(int c)
 					printRight("...customID full");
 					continue;
 				}
-				myprintf("\n");
-				myprintf("\n");
+
 				bbp.init(buffer, entry.fileSize);
 				bbp.raw_to_bbp();
 				bbp.set_id(id);
@@ -350,6 +420,7 @@ Result DeletePacks()
 			}
 			int cnt=0;
 			for (int i = 0; i < 3700; i++)//not really very slow.....
+				//will delete even if there are duplicate IDs.
 			{
 				if (jbMgr.Items[i].ID == (u32)-1) continue; // id != -1 for the item to be valid
 				if (!(jbMgr.Items[i].Flags & 1)) continue; // bit0 == 1 to be valid
