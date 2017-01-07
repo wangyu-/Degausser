@@ -246,7 +246,7 @@ vector<u32> get_song_idx_from_song_list(string path)
 	    u32 len=p-sub_str;
 	    if(len<8)
 	    {
-	    	myprintf("skipped line %d ,not enough length",line);
+	    	myprintf("skipped line %d ,not enough length;",line);
 	    	continue;
 	    }
 	    int fail=0;
@@ -254,7 +254,7 @@ vector<u32> get_song_idx_from_song_list(string path)
 	    {
 	    	if(!( ('0'<=*p&&*p<='9') || ('a'<=*p&&*p<='f') ))
 	    	{
-	    		myprintf("invaild number at line %d %lx,skipped",line,(u32)*p);
+	    		myprintf("invaild number at line %d %lx,skipped;",line,(u32)*p);
 	    		fail=1;
 	    		break;
 	    	}
@@ -262,7 +262,7 @@ vector<u32> get_song_idx_from_song_list(string path)
 	    if(fail) continue;
 	    if(('0'<=*p&&*p<='9') || ('a'<=*p&&*p<='f') )
 	    {
-    		myprintf("longer number than expected at line %d,skipped",line);
+    		myprintf("longer number than expected at line %d,skipped;",line);
     		continue;
 	    }
 	    u32 id;
@@ -270,12 +270,12 @@ vector<u32> get_song_idx_from_song_list(string path)
 	    debugprintf("<id:%lx>",id);
 	    if(id==(u32)-1)
 	    {
-    		myprintf("skipped invaild id ffffffff",line);
+    		myprintf("skipped invaild id ffffffff;",line);
     		continue;
 	    }
 	    if(JbMgrIdx.has_id(id)==0)
 	    {
-    		myprintf("no such id %lx,skipped",id);
+    		myprintf("no such id %lx,skipped;",id);
     		continue;
 	    }
 	    vec.push_back(JbMgrIdx.used_id[id]);

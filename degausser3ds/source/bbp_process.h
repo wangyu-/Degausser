@@ -28,7 +28,7 @@ struct Bbp //fully decompress ,not used
 	u8* get_raw();
 };*/
 
-struct fBbp  //faster implement  //do not unzip //pass raw by pointer
+struct fBbp  //faster implement  //do not unzip vocal //pass raw by pointer
 {
 	u8 *raw;
 	u32 size;

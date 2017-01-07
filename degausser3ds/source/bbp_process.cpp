@@ -175,24 +175,13 @@ u8* fBbp:: get_raw()
 }
 
 
-#ifdef TEST
+#ifdef TEST //test bbp processor on computer
 u8 buffer[524288];
 fBbp bbp;
 fBbp bbp2;
-#include <iconv.h>
+
 int main()
 {
-	size_t len16 = 3 * sizeof(wchar_t);
-	size_t len8 = 7;
-	u16 utf16[3] = { 0x0068, 0x0069, 0x0000 }, *_utf16 = utf16;
-	char utf8[7], *_utf8 = utf8;
-
-	iconv_t utf16_to_utf8 = iconv_open("UTF-8", "UTF-16LE");
-	size_t result = iconv(utf16_to_utf8, (char **)&_utf16, &len16, &_utf8, &len8);
-
-	printf("%d - %s\n", (int)result, utf8);
-
-	iconv_close(utf16_to_utf8);
 
 
 
