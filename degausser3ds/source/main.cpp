@@ -281,7 +281,7 @@ vector<u32> get_song_idx_from_song_list(string path)
 	    vec.push_back(JbMgrIdx.used_id[id]);
 
 	}
-	myprintf("finish reading %s.it contains %d lines,%d vaild IDs to export\n",path.c_str(),line,vec.size());
+	myprintf("finish reading %s.it contains %d lines,%d vaild&existing IDs\n",path.c_str(),line,vec.size());
 	return vec;
 }
 
@@ -382,7 +382,7 @@ Result DumpAllPacks(int dump_list_file,int dump_by_list)
 			TRYCONT(FSUSER_OpenFile(&handle, sdmc_archive, fsMakePath(PATH_UTF16, bbpPath), FS_OPEN_CREATE | FS_OPEN_WRITE, 0), "Unable to create bbp file");
 			TRYCONT(FSFILE_Write(handle, NULL, 0, buffer, 312 + filesize, FS_WRITE_FLUSH | FS_WRITE_UPDATE_TIME), "Unable to write bbp file header");
 			FSFILE_Close(handle);
-			//printRight("...SUCCESS!");
+			myprintf("...SUCCESS!\n");
 		}
 		else
 		{
@@ -406,23 +406,24 @@ Result DumpAllPacks(int dump_list_file,int dump_by_list)
 	if(dump_list_file==1)
 	{
 		Handle handle;
-		if(utf16_to_utf8(buffer,(const u16*)song_list.c_str(),sizeof(buffer) )==-1)
+		song_list+=(char)0;
+		song_list+=(char)0;
+		int res=utf16_to_utf8(buffer,(const u16*)song_list.c_str(),sizeof(buffer) );//this function wont set endofstr to zero
+		if(res==-1)
 		{
-			myprintf("convert utf16 to utf8 failed,saving songlist to /bbpdump/songlist.utf16.txt");
+			myprintf("convert utf16 to utf8 failed,saving songlist to /bbpdump/songlist.utf16.txt\n");
 			FSUSER_DeleteFile(sdmc_archive,fsMakePath(PATH_ASCII, "/bbpdump/songlist.utf16.txt"));
 			TRY(FSUSER_OpenFile(&handle, sdmc_archive,  fsMakePath(PATH_ASCII, "/bbpdump/songlist.utf16.txt"), FS_OPEN_CREATE | FS_OPEN_WRITE, 0), "Unable to create songlist.utf16.txt");
-			TRY(FSFILE_Write(handle, NULL, 0,song_list.c_str(),song_list.size(), FS_WRITE_FLUSH | FS_WRITE_UPDATE_TIME), "Unable to write songlist.utf16.txt");
+			TRY(FSFILE_Write(handle, NULL, 0,song_list.c_str(),song_list.size()-2, FS_WRITE_FLUSH | FS_WRITE_UPDATE_TIME), "Unable to write songlist.utf16.txt");
 			FSFILE_Close(handle);
 		}
 		else
 		{
-			song_list+=(char)0;
-			song_list+=(char)0;
-			int len=strlen((const char *)buffer);
+			//int len=strlen((const char *)buffer);
 			debugprintf("songlist.size:%d",song_list.size());
-			FSUSER_DeleteFile(sdmc_archive,fsMakePath(PATH_ASCII, "/bbpdump/songlist.txt"));
+			FSUSER_DeleteFile(sdmc_archive,fsMakePath(PATH_ASCII, "/bbpdump/songlist.txt"));//must delete...weird problem otherwise...
 			TRY(FSUSER_OpenFile(&handle, sdmc_archive,  fsMakePath(PATH_ASCII, "/bbpdump/songlist.txt"), FS_OPEN_CREATE | FS_OPEN_WRITE, 0), "Unable to create songlist.txt");
-			TRY(FSFILE_Write(handle, NULL, 0, buffer, len, FS_WRITE_FLUSH | FS_WRITE_UPDATE_TIME), "Unable to write songlist.txt");
+			TRY(FSFILE_Write(handle, NULL, 0, buffer, res, FS_WRITE_FLUSH | FS_WRITE_UPDATE_TIME), "Unable to write songlist.txt");
 			FSFILE_Close(handle);
 			myprintf("Exported %u bbp entires to sdmc://bbpdump/songlist.txt\n", exportCount);
 		}
@@ -484,11 +485,11 @@ Result ImportPacks(int c)
 
 		if (FSUSER_OpenFile(&handle, sdmc_archive, fsMakePath(PATH_UTF16, bbpPath), FS_OPEN_READ, 0))
 		{
-			printRight("...unable to open");
+			myprintf("...unable to open\n");
 		}
 		else if (entry.fileSize > 131072)
 		{
-			printRight("...file too large");
+			myprintf("...file too large\n");
 			FSFILE_Close(handle);
 		}
 		else
@@ -503,17 +504,17 @@ Result ImportPacks(int c)
 				item = (_JbMgrItem*)buffer;
 				if ((item->ID >> 16) == 0x8000)
 				{
-					printRight("...customID error");
+					myprintf("...customID error\n");
 					continue;
 				}
 				else if (JbMgrIdx.has_id(item->ID))
 				{
-					printRight("...already exists");
+					myprintf("...already exists\n");
 					continue;
 				}
 				if (JbMgrIdx.empty_slots_size()==0)
 				{
-					printRight("...no empty slot");
+					myprintf("...no empty slot\n");
 					continue;
 				}
 			}
@@ -521,14 +522,14 @@ Result ImportPacks(int c)
 			{
 				if (JbMgrIdx.empty_slots_size()==0)
 				{
-					printRight("...no empty slot");
+					myprintf("...no empty slot\n");
 					continue;
 				}
 				u32 id=JbMgrIdx.get_an_unused_custom_id();
 				if(id==(u32)-1)
 				{
 					//full
-					printRight("...customID full");
+					myprintf("...customID full\n");
 					continue;
 				}
 
@@ -543,13 +544,22 @@ Result ImportPacks(int c)
 
 
 
+			char dirPath[32];
 			char packPath[32];
+			sprintf(dirPath, "/jb/gak/%08lx", item->ID);
 			sprintf(packPath, "/jb/gak/%08lx", item->ID);
-			FSUSER_CreateDirectory(extdata_archive, fsMakePath(PATH_ASCII, packPath), 0);
-			strcat(packPath, "/pack");
 
-			FS_Path fsPath = fsMakePath(PATH_ASCII, packPath);
-			TRYCONT(FSUSER_CreateFile(extdata_archive, fsPath, 0, size - 312),"create pack file fail;");
+			strcat(packPath, "/pack");
+			FS_Path fsPath;
+			fsPath = fsMakePath(PATH_ASCII, packPath);
+			debugprintf("packPath:%s;",packPath);
+			//FSUSER_DeleteDirectoryRecursively(extdata_archive, fsMakePath(PATH_ASCII, packPath));
+			if(FSUSER_CreateDirectory(extdata_archive, fsMakePath(PATH_ASCII, dirPath), 0))
+			{
+				debugprintf("create dir %s fail;",dirPath);
+				FSUSER_DeleteFile(extdata_archive,fsPath);
+			}
+			FSUSER_CreateFile(extdata_archive, fsPath, 0, size - 312); //do not check failure;
 			TRYCONT(FSUSER_OpenFile(&handle, extdata_archive, fsPath, FS_OPEN_WRITE, 0),"open pack file fail;");
 			TRYCONT(FSFILE_Write(handle, NULL, 0, buffer + 312, size - 312, FS_WRITE_FLUSH),"write pack file fail");
 			FSFILE_Close(handle);
@@ -557,7 +567,7 @@ Result ImportPacks(int c)
 			// TODO: CHECK FIRST THAT PACK WAS SUCCESSFULLY CREATED!?
 			JbMgrIdx.insert(item);
 
-			printRight("...SUCCESS!");
+			myprintf("...SUCCESS!\n");
 			fileCount++;
 		}
 	}
@@ -654,13 +664,13 @@ Result DeletePacks(int fast)
 		}
 		if (JbMgrIdx.has_id(id)==0)
 		{
-			printRight("...not found!");
+			myprintf("...not found!\n");
 			continue;
 		}
 
 		if(JbMgrIdx.delete_by_id(id)!=0)
 		{
-			myprintf("delete fail!");
+			myprintf("delete fail!\n");
 			continue;
 		}
 
@@ -672,11 +682,11 @@ Result DeletePacks(int fast)
 			if(FSUSER_DeleteDirectoryRecursively(extdata_archive, fsMakePath(PATH_ASCII, packPath)))
 			{
 				myprintf("\ndelete dir %s fail!\n",packPath);
-				printRight("...part SUCCESS!");
+				myprintf("...part SUCCESS!\n");
 				continue;
 			}
 		}
-		if(!fast) printRight("...SUCCESS!");
+		if(!fast) myprintf("...SUCCESS!\n");
 
 	}
 
@@ -726,13 +736,9 @@ int main()
 	if(hidKeysHeld() & KEY_B) g_show_log=1;
 	//gfxInitDefault();
 	//consoleInit(GFX_BOTTOM, NULL);
-	
-	//FSUSER_OpenArchive(&sdmc_archive); ImportPacks(); while(true);
-	myprintf("<%d %d %d %d>",(int)JbMgrIdx.empty_slots.size(),(int)JbMgrIdx.non_empty_slots.size(),(int)JbMgrIdx.unused_custom_id.size(),(int)JbMgrIdx.used_id.size());
-	debugprintf("<%d %d %d %d>",(int)JbMgrIdx.unused_custom_id.size(),(int)JbMgrIdx.empty_slots.size(),(int)JbMgrIdx.non_empty_slots.size(),(int)JbMgrIdx.used_id.size());
-	debugprintf("<%d %d %d %d>",(int)JbMgrIdx.empty_slots.size(),(int)JbMgrIdx.non_empty_slots.size(),(int)JbMgrIdx.unused_custom_id.size(),(int)JbMgrIdx.used_id.size());
-	myprintf("<%d %d %d %d>",(int)JbMgrIdx.empty_slots.size(),(int)JbMgrIdx.non_empty_slots.size(),(int)JbMgrIdx.unused_custom_id.size(),(int)JbMgrIdx.used_id.size());
 
+	//FSUSER_OpenArchive(&sdmc_archive); ImportPacks(); while(true);
+	
 	myprintf("== degausser3ds v2.2a modified==\n");
 	myprintf("Loading Daigasso! Band Bros P extdata into memory...\n");
 	if (FSUSER_OpenArchive(&extdata_archive)) myprintf("ERROR: Unable to open DBBP extdata.\n");

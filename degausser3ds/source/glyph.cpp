@@ -117,15 +117,15 @@ void print(u16* str)
 	}
 	glyphWait();
 }
-
-void printRight(const char* str)
+/*
+void printRight(const char* str) //it overwrites debug info...
 {
 	curX = 53 - strlen(str);
 	if (curX < 0) curX = 0;
 	while (*str) printChar(*str++);
 	printChar('\n');
 	glyphWait();
-}
+}*/
 
 void myprintf(const char* fmt, ...)
 {
