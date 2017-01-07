@@ -50,6 +50,9 @@ typedef s32 Result;
 #endif
 
 
+
+extern int g_show_log;
+
 void debugprintf(const char* fmt, ...);
 
 void print(char* str);

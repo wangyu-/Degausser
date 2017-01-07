@@ -9,10 +9,14 @@
 
 
 
+int g_show_log=0;
+
 #ifdef TEST
+
 
 void debugprintf(const char* fmt, ...)
 {
+	if(g_show_log==0)return;
 	va_list args;
 	va_start(args,fmt);
 	vprintf(fmt, args);
@@ -25,10 +29,13 @@ void debugprintf(const char* fmt, ...)
 
 void debugprintf(const char* fmt, ...)
 {
+	if(g_show_log==0)return;
+	char buffer[2560];
 	va_list args;
 	va_start(args,fmt);
-	myprintf(fmt);
+	vsprintf(buffer, fmt, args);
 	va_end(args);
+	print((const char *)buffer);
 }
 #endif
 

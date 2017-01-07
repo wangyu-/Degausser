@@ -122,7 +122,7 @@ int fBbp:: raw_to_bbp()
 	int res;
 	memcpy((u8*)&item,raw,sizeof(item));
 	memcpy((u8*)&header,raw+sizeof(item)/*312*/,sizeof(header));
-	debugprintf("\nmain start=%d\n ",header.main_start);
+	//debugprintf("\nmain start=%d\n ",header.main_start);
 	size_main=sizeof(main);
 	if ((res=gz_decompress2(main,&size_main,raw+sizeof(item)+header.main_start,header.main_size))!=0)
 	{
@@ -179,8 +179,26 @@ u8* fBbp:: get_raw()
 u8 buffer[524288];
 fBbp bbp;
 fBbp bbp2;
+#include <iconv.h>
 int main()
 {
+	size_t len16 = 3 * sizeof(wchar_t);
+	size_t len8 = 7;
+	u16 utf16[3] = { 0x0068, 0x0069, 0x0000 }, *_utf16 = utf16;
+	char utf8[7], *_utf8 = utf8;
+
+	iconv_t utf16_to_utf8 = iconv_open("UTF-8", "UTF-16LE");
+	size_t result = iconv(utf16_to_utf8, (char **)&_utf16, &len16, &_utf8, &len8);
+
+	printf("%d - %s\n", (int)result, utf8);
+
+	iconv_close(utf16_to_utf8);
+
+
+
+
+
+	g_show_log=1;
 	printf("asdasd");
 	fflush(stdout);
 	printf("%d ",sizeof(_JbMgrItem));

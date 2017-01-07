@@ -5,6 +5,7 @@
 
 extern u32 glyphs[6756][6];
 
+
 void printRight(const char* str);
 //#define print(STR) _Generic((STR), char*: print8, u16*: print16)(STR)
 void glyphInit();
@@ -21,6 +22,7 @@ void myprintf(const char* fmt, ...);
 #ifndef GLYPH_HEADER_FILE_ONLY
 u16 *scrTop, *scrBtm;
 int curX = 0, curY = 0;
+
 
 void glyphInit()
 {
@@ -94,10 +96,27 @@ void printChar(u16 c)
 		}
 		curX += width;
 	}
+
 }
 
-void print(const char* str) { while (*str) printChar(*str++); glyphWait(); }
-void print(u16* str) { while (*str) printChar(*str++); glyphWait(); }
+void print(const char* str)
+{
+	while (*str)
+	{
+		if (curX>=53) printChar(10);
+		printChar(*str++);
+	}
+	glyphWait();
+}
+void print(u16* str)
+{
+	while (*str)
+	{
+		if (curX>=52) printChar(10);
+		printChar(*str++);
+	}
+	glyphWait();
+}
 
 void printRight(const char* str)
 {
@@ -110,7 +129,7 @@ void printRight(const char* str)
 
 void myprintf(const char* fmt, ...)
 {
-	char buffer[256];
+	char buffer[2560];
 	va_list args;
 	va_start(args,fmt);
 	vsprintf(buffer, fmt, args);
