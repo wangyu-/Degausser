@@ -43,5 +43,6 @@ struct fBbp  //faster implement  //do not unzip vocal //pass raw by pointer
 	int raw_to_bbp();
 	int bbp_to_raw();
 	int raw_size();
+	int do_tricks();
 	u8* get_raw();
 };

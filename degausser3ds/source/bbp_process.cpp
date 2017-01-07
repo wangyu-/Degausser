@@ -117,6 +117,11 @@ int fBbp:: set_id(u32 id)
 	set_u32(main,4,id);
 	return 0;
 }
+int fBbp:: do_tricks()
+{
+	memset(header.unused3,0,sizeof(header.unused3));//clear this unknown zone to avoid problem
+	return 0;
+}
 int fBbp:: raw_to_bbp()
 {
 	int res;
@@ -138,6 +143,7 @@ int fBbp:: raw_to_bbp()
 }
 int fBbp:: bbp_to_raw()
 {
+	do_tricks();
 	int res;
 	memset(raw,0,size);
 	memcpy(raw,(u8*)&item,sizeof(item));
@@ -182,11 +188,6 @@ fBbp bbp2;
 
 int main()
 {
-
-
-
-
-
 	g_show_log=1;
 	printf("asdasd");
 	fflush(stdout);
