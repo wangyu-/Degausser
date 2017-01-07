@@ -197,6 +197,11 @@ int main()
 	FILE *fp;
 	int size;
 	fp=fopen("./test.bbp","rb");
+	if(fp==-1)
+	{
+		printf("copy a bbp file as test.bbp first\n");
+		return -1;
+	}
 	printf("%d",fp);
 	fflush(stdout);
     fseek (fp, 0 , SEEK_END);
