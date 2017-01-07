@@ -197,7 +197,7 @@ int main()
 	FILE *fp;
 	int size;
 	fp=fopen("./test.bbp","rb");
-	if(fp==-1)
+	if(fp==NULL)
 	{
 		printf("copy a bbp file as test.bbp first\n");
 		return -1;
