@@ -722,8 +722,8 @@ void ShowInstructions()
 	myprintf("\n");
 	if (initialised)
 	{
-     debugprintf("123456789012345678901234567890123456789012345678901234567890\n");
-
+     //debugprintf("123456789012345678901234567890123456789012345678901234567890\n");
+		debugprintf("debug info is now turned on\n");
 		myprintf("Press X to dump all BBP files(to /bbpdump/).\n");
 		myprintf("Press Y to import all BBP files(from /bbpimport/)\n");
 		myprintf("A to import all BBP as custom(from /bbpimportc/).\n");
