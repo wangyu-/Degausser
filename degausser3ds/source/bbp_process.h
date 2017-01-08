@@ -1,13 +1,14 @@
 struct Header
 {
-	u32 unused[3];
+	u32 unused[2];
+	u32 main_uncompressed_size;
 	u32 main_start;//3
 	u32 main_size;//4
 	u32 has_voc;//5
-	u32 unused2;//vocal id?
+	u32 voc_uncompressed_size;//
 	u32 voc_start;//7
 	u32 voc_size;//8
-	u32 unused3[8];
+	u32 unused2[8];
 };
 /*
 struct Bbp //fully decompress ,not used

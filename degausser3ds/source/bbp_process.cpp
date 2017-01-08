@@ -119,7 +119,9 @@ int fBbp:: set_id(u32 id)
 }
 int fBbp:: do_tricks()
 {
-	memset(header.unused3,0,sizeof(header.unused3));//clear this unknown zone to avoid problem
+	header.unused[0]=0x20001;
+	header.unused[1]=1;
+	memset(header.unused2,0,sizeof(header.unused2));//clear this unknown zone to avoid problem
 	return 0;
 }
 int fBbp:: raw_to_bbp()

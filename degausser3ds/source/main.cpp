@@ -180,8 +180,8 @@ Result WriteJbMgr()
 	{
 		Handle handle;
 		TRY(FSUSER_OpenFile(&handle, extdata_archive, fsMakePath(PATH_ASCII, paths[i]), FS_OPEN_WRITE, 0), "Unable to write to jbMgr");
-		FSFILE_Write(handle, NULL, 0, buffer, compLen, FS_WRITE_FLUSH);
-		FSFILE_Write(handle, NULL, 1155068, &compLen, 4, FS_WRITE_FLUSH);
+		TRY(FSFILE_Write(handle, NULL, 0, buffer, compLen, FS_WRITE_FLUSH),"write mgr fail");
+		TRY(FSFILE_Write(handle, NULL, 1155068, &compLen, 4, FS_WRITE_FLUSH),"write mgr fail");
 		FSFILE_Close(handle);
 	}
 	
@@ -221,7 +221,10 @@ vector<u32> get_song_idx_from_song_list(string path)
 {
 	vector<u32> vec;
 	Handle handle;
-	FSUSER_OpenFile(&handle, sdmc_archive, fsMakePath(PATH_ASCII, path.c_str()), FS_OPEN_READ, 0);
+	if(FSUSER_OpenFile(&handle, sdmc_archive, fsMakePath(PATH_ASCII, path.c_str()), FS_OPEN_READ, 0))
+	{
+		myprintf("open %s fail!\n",path.c_str());
+	}
 	u64 filesize;
 	FSFILE_GetSize(handle,&filesize);
 	FSFILE_Read(handle, NULL, 0, buffer, filesize);
@@ -378,8 +381,10 @@ Result DumpAllPacks(int dump_list_file,int dump_by_list)
 			// dump contents of buffer to "/bbpdump/<title> (<author>).bbp"
 
 			ConcatUTF16(bbpPath, false, u"/bbpdump/", tmp_id2,item->Title, u" (", item->Author, u").bbp", NULL);
-			//FSUSER_DeleteFile(sdmc_archive,fsMakePath(PATH_UTF16, bbpPath));//slower,the code below doesnt reset filesize to zero
+
+
 			TRYCONT(FSUSER_OpenFile(&handle, sdmc_archive, fsMakePath(PATH_UTF16, bbpPath), FS_OPEN_CREATE | FS_OPEN_WRITE, 0), "Unable to create bbp file");
+			TRYCONT(FSFILE_SetSize(handle,312 + filesize),"set file size fail");
 			TRYCONT(FSFILE_Write(handle, NULL, 0, buffer, 312 + filesize, FS_WRITE_FLUSH | FS_WRITE_UPDATE_TIME), "Unable to write bbp file header");
 			FSFILE_Close(handle);
 			myprintf("...SUCCESS!\n");
@@ -412,8 +417,9 @@ Result DumpAllPacks(int dump_list_file,int dump_by_list)
 		if(res==-1)
 		{
 			myprintf("convert utf16 to utf8 failed,saving songlist to /bbpdump/songlist.utf16.txt\n");
-			FSUSER_DeleteFile(sdmc_archive,fsMakePath(PATH_ASCII, "/bbpdump/songlist.utf16.txt"));
+
 			TRY(FSUSER_OpenFile(&handle, sdmc_archive,  fsMakePath(PATH_ASCII, "/bbpdump/songlist.utf16.txt"), FS_OPEN_CREATE | FS_OPEN_WRITE, 0), "Unable to create songlist.utf16.txt");
+			TRY(FSFILE_SetSize(handle,song_list.size()-2),"set file size fail");
 			TRY(FSFILE_Write(handle, NULL, 0,song_list.c_str(),song_list.size()-2, FS_WRITE_FLUSH | FS_WRITE_UPDATE_TIME), "Unable to write songlist.utf16.txt");
 			FSFILE_Close(handle);
 		}
@@ -421,8 +427,9 @@ Result DumpAllPacks(int dump_list_file,int dump_by_list)
 		{
 			//int len=strlen((const char *)buffer);
 			debugprintf("songlist.size:%d",song_list.size());
-			FSUSER_DeleteFile(sdmc_archive,fsMakePath(PATH_ASCII, "/bbpdump/songlist.txt"));//must delete...weird problem otherwise...
+
 			TRY(FSUSER_OpenFile(&handle, sdmc_archive,  fsMakePath(PATH_ASCII, "/bbpdump/songlist.txt"), FS_OPEN_CREATE | FS_OPEN_WRITE, 0), "Unable to create songlist.txt");
+			TRY(FSFILE_SetSize(handle,res),"set file size fail");
 			TRY(FSFILE_Write(handle, NULL, 0, buffer, res, FS_WRITE_FLUSH | FS_WRITE_UPDATE_TIME), "Unable to write songlist.txt");
 			FSFILE_Close(handle);
 			myprintf("Exported %u bbp entires to sdmc://bbpdump/songlist.txt\n", exportCount);
@@ -471,7 +478,7 @@ Result ImportPacks(int c)
 		print("* ");
 		print(entry.name);
 		
-		print("\n");
+		print(" ");
 		Handle handle;
 		u16 bbpPath[300];
 		if(c==0)
@@ -486,13 +493,15 @@ Result ImportPacks(int c)
 		if (FSUSER_OpenFile(&handle, sdmc_archive, fsMakePath(PATH_UTF16, bbpPath), FS_OPEN_READ, 0))
 		{
 			myprintf("...unable to open\n");
+			continue;
 		}
-		else if (entry.fileSize > 131072)
+		if (entry.fileSize > 131072)
 		{
 			myprintf("...file too large\n");
 			FSFILE_Close(handle);
+			continue;
 		}
-		else
+		//else
 		{
 			int size=entry.fileSize;
 			FSFILE_Read(handle, NULL, 0, buffer, entry.fileSize);
@@ -561,6 +570,7 @@ Result ImportPacks(int c)
 			}
 			FSUSER_CreateFile(extdata_archive, fsPath, 0, size - 312); //do not check failure;
 			TRYCONT(FSUSER_OpenFile(&handle, extdata_archive, fsPath, FS_OPEN_WRITE, 0),"open pack file fail;");
+			//TRYCONT(FSFILE_SetSize(handle,0),"set pack file size fail;");//set size doesnt work here....
 			TRYCONT(FSFILE_Write(handle, NULL, 0, buffer + 312, size - 312, FS_WRITE_FLUSH),"write pack file fail");
 			FSFILE_Close(handle);
 
@@ -652,7 +662,7 @@ Result DeletePacks(int fast)
 		{
 			if(i>0&&i%20==0)
 			{
-				myprintf("%d processed,%d remaining",i,vec.size()-i);
+				myprintf("%d processed,%d remaining;",i,vec.size()-i);
 			}
 		}
 
@@ -716,7 +726,7 @@ void ShowInstructions()
 
 		myprintf("Press X to dump all BBP files(to /bbpdump/).\n");
 		myprintf("Press Y to import all BBP files(from /bbpimport/)\n");
-		myprintf("A to import BBP as custom(from /bbpimportc/).\n");
+		myprintf("A to import all BBP as custom(from /bbpimportc/).\n");
 		myprintf("LEFT to dump a songlist(to /bbpdump/songlist.txt)\n");
 		myprintf("RIGHT to dump BBP by(/bbpdump/songlist.txt)\n");
 		myprintf("UP to del songs by(/bbpdelete/songlist.txt)\n");
@@ -725,6 +735,7 @@ void ShowInstructions()
 	}
 	myprintf("Press START to exit.\n\n");
 }
+
 
 
 int main()
