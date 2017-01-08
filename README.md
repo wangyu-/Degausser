@@ -29,5 +29,7 @@ In the future we might use this space to discuss some of the file formats, but o
 
 2. put degausser3ds.3dsx degausser3ds.smdh into SDCARD:\3DS\degausser3ds\
 
+3. run it via hblauncher, then follow the instructions
+
  then follow the instructions
 
