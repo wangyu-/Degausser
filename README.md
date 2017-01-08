@@ -25,7 +25,7 @@ In the future we might use this space to discuss some of the file formats, but o
 
 # how to use degausser3ds(for cfw user):
 
-1. get hblauncher_loader.cia and install https://github.com/yellows8/hblauncher_loader/releases
+1. get hblauncher_loader.cia and install (from https://github.com/yellows8/hblauncher_loader/releases)
 
 2. put degausser3ds.3dsx degausser3ds.smdh into SDCARD:\3DS\degausser3ds\
 
