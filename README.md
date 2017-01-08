@@ -12,13 +12,13 @@ In the future we might use this space to discuss some of the file formats, but o
 
 # new features in this repo(degausser3ds only):
 
-1. import songs as custom (so that it will be edit-able in game) from SD:\bbpimportc\
+1. import songs as custom (so that it will be edit-able in game) from "SD:\bbpimportc\"
 
 2. dump a songlist(will not dump BBP files)  to "SD:\bbpdump\songlist.txt"
 
 3. delete specific songs by "SD:\bbpdelete\songlist.txt"
 
-4. dump specific songs by "SD:\bbpdump\songlist.txt".
+4. dump specific songs by "SD:\bbpdump\songlist.txt"
 
 "songlist.txt" should be in utf8 format (with or without BOM). one ID per line(a hex number of 8 digits),the rest characters of each line will be ignored. see degausser3ds/examples/ for more info. you can just copy the "songlist.txt" created by "dump songlist" feature and edit it.
 
