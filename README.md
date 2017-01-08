@@ -9,29 +9,40 @@ Save editor for Daigasso! Band Brothers P. There are currently two flavours:
 
 In the future we might use this space to discuss some of the file formats, but otherwise feel free to check out the Releases.
 
-
 # new features in this repo(degausser3ds only):
 
-1. import songs as custom (so that it will be edit-able in game) from "SD:\bbpimportc\"
+
+1. import songs as custom (so that it will be edit-able in game) from SD:\bbpimportc\
+
 
 2. dump a songlist(will not dump BBP files)  to "SD:\bbpdump\songlist.txt"
 
+
 3. delete specific songs by "SD:\bbpdelete\songlist.txt"
+
 
 4. dump specific songs by "SD:\bbpdump\songlist.txt"
 
-"songlist.txt" should be in utf8 format (with or without BOM) or in plain ASCII. one ID per line(a hex number of 8 digits),the rest characters of each line will be ignored. see degausser3ds/examples/ for more info. you can just copy the "songlist.txt" created by "dump songlist" feature and edit it.
-
-(Q:how do i know the ID of a song?A:by the "dump songlist" feature)
 
 
-# how to use degausser3ds(for cfw user):
+#format about songlist.txt(when using feature 3 or 4):
 
+
+"songlist.txt" should be in utf8 encoding(with or without BOM) or plain ASCII.most time you dont need to worry about encoding,the default encoding of your editor will be okay.
+
+"songlist.txt" should contain IDs of songs,one ID(a hex number of 8 digits) at beginning of each line,the rest characters of each line will be ignored. see /examples/ for more info. 
+
+the format is compatiable with "songlist.txt" dumped by feature 2,you can just copy the dumped "songlist.txt" and edit it
+
+Q:how do i know the ID of a song?  A:by the songlist.txt you dumped in feature 2
+
+
+
+# how to install(for cfw user):
 1. get hblauncher_loader.cia and install (from https://github.com/yellows8/hblauncher_loader/releases)
 
 2. put degausser3ds.3dsx degausser3ds.smdh into SDCARD:\3DS\degausser3ds\
 
-3. run it via hblauncher, then follow the instructions
 
- then follow the instructions
+3. run it via hblauncher, then follow the instructions
 
