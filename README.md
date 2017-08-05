@@ -9,8 +9,6 @@ Save editor for Daigasso! Band Brothers P. There are currently two flavours:
 
 In the future we might use this space to discuss some of the file formats, but otherwise feel free to check out the Releases.
 
-# screenshot
-![screenshot](https://github.com/wangyu-/Degausser/blob/master/Capture.PNG)
 # new features in this repo(degausser3ds only):
 
 
@@ -48,3 +46,5 @@ Q:how do i know the ID of a song?  A:by the songlist.txt you dumped in feature 2
 
 3. run it via hblauncher, then follow the instructions
 
+# screenshot
+![screenshot](https://github.com/wangyu-/Degausser/blob/master/Capture.PNG)
